@@ -48,7 +48,10 @@ func r2Exec() {
 
 	// Get compiler version
 	v, err := file.GetCompilerVersion()
-	if err != nil {
+	if err == gore.ErrNoGoVersionFound {
+		fmt.Println("Failed to determine the compiler version, assuming", assumedGoVersion)
+		file.SetGoVersion(assumedGoVersion)
+	} else if err != nil {
 		fmt.Println("Failed to determine the compiler version:", err)
 	} else {
 		fmt.Printf("Compiler version: %s (%s)\n", v.Name, v.Timestamp)

@@ -49,6 +49,11 @@ func standalone() {
 
 	if *options.printTypes || *options.printStructs || *options.printIntefaces {
 		typs, err := f.GetTypes()
+		if err == gore.ErrNoGoVersionFound {
+			// Force the assumed version and try again.
+			f.SetGoVersion(assumedGoVersion)
+			typs, err = f.GetTypes()
+		}
 		if err != nil {
 			fmt.Println(err)
 			return

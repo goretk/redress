@@ -11,6 +11,10 @@ import (
 	"github.com/TcM1911/r2g2"
 )
 
+const (
+	assumedGoVersion = "go1.12"
+)
+
 type option struct {
 	printPackages        *bool
 	printStdLibPackages  *bool

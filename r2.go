@@ -72,6 +72,10 @@ func r2Exec() {
 	fmt.Printf("%d packages found.\n", len(pkgs))
 	applyFuncSymbols(pkgs, r2)
 
+	// Analyze init and main
+	r2.Run("afr @ sym.main.init")
+	r2.Run("afr @ sym.main.main")
+
 	types, err := file.GetTypes()
 	if err != nil {
 		fmt.Println("Error when getting types:", err)
@@ -86,9 +90,6 @@ func r2Exec() {
 		count++
 	}
 	fmt.Printf("%d type symbols found\n", count)
-	// Analyze init and main
-	r2.Run("afr @ sym.main.init")
-	r2.Run("afr @ sym.main.main")
 }
 
 func applyFuncSymbols(pkgs []*gore.Package, r2 *r2g2.Client) {

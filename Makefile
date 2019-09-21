@@ -20,7 +20,7 @@ TARGET_FOLDER=dist
 PACKAGE=$(APP)-$(VERSION)
 TAR_ARGS=cfz
 RELEASE_FILES=LICENSE README.md
-BUILD_OPTS=-ldflags="-s -w -X main.redressVersion=$(VERSION)" -gcflags="all=-trimpath=$(GOPATH)/src" -asmflags="-trimpath=$(GOPATH)/src"
+BUILD_OPTS=-ldflags="-s -w -X main.redressVersion=$(VERSION)" -trimpath
 
 # Linux options
 

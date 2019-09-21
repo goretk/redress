@@ -76,8 +76,8 @@ func r2Exec() {
 	applyFuncSymbols(pkgs, r2)
 
 	// Analyze init and main
-	r2.Run("afr @ sym.main.init")
-	r2.Run("afr @ sym.main.main")
+	r2.Run("afr @ fcn.main.init")
+	r2.Run("afr @ fcn.main.main")
 
 	types, err := file.GetTypes()
 	if err != nil {
@@ -103,7 +103,7 @@ func applyFuncSymbols(pkgs []*gore.Package, r2 *r2g2.Client) {
 				continue
 			}
 			r2.NewFlagWithLength(
-				"sym."+cleanupName(p.Name)+"."+cleanupName(f.Name),
+				"fcn."+cleanupName(p.Name)+"."+cleanupName(f.Name),
 				f.Offset,
 				f.End-f.Offset)
 			count++
@@ -113,7 +113,7 @@ func applyFuncSymbols(pkgs []*gore.Package, r2 *r2g2.Client) {
 				continue
 			}
 			r2.NewFlagWithLength(
-				"sym."+cleanupName(p.Name)+"#"+cleanupName(m.Receiver)+"."+cleanupName(m.Name),
+				"fcn."+cleanupName(p.Name)+"#"+cleanupName(m.Receiver)+"."+cleanupName(m.Name),
 				m.Offset,
 				m.End-m.Offset)
 			count++

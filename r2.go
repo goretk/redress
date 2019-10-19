@@ -5,8 +5,13 @@
 package main
 
 import (
+	"bytes"
+	"encoding/binary"
+	"flag"
 	"fmt"
+	"io"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/TcM1911/r2g2"
@@ -43,6 +48,27 @@ func r2Exec() {
 	// Lookup type?
 	if *options.lookupType != 0 {
 		lookupType(file, uint64(*options.lookupType))
+		return
+	}
+
+	// Print a string slice
+	if *options.resolveStrSlice {
+		args := flag.Args()
+		if len(args) != 2 {
+			fmt.Println("2 arguments are required. Address and slice length")
+			return
+		}
+		address, err := strconv.ParseUint(args[0], 0, 32)
+		if err != nil {
+			fmt.Println("Failed to parse address argument:", err)
+			return
+		}
+		length, err := strconv.ParseUint(args[1], 0, 32)
+		if err != nil {
+			fmt.Println("Failed to parse length argument:", err)
+			return
+		}
+		printStringSlice(file, address, length)
 		return
 	}
 
@@ -144,4 +170,45 @@ func lookupType(f *gore.GoFile, addr uint64) {
 			fmt.Println(gore.MethodDef(typ))
 		}
 	}
+}
+
+func printStringSlice(f *gore.GoFile, offset uint64, length uint64) {
+	// Number of bytes needed for each string is one word for pointer to data and
+	// one word for the length of the data. This needs to be multiplied by the length
+	// of the array.
+	arrayData, err := f.Bytes(offset, 2*length*uint64(f.FileInfo.WordSize))
+	if err != nil {
+		fmt.Println("Failed to get string slice:", err)
+		return
+	}
+	r := bytes.NewReader(arrayData)
+	for i := 0; i < int(length); i++ {
+		strPtr, err := readUintToUint64(r, f.FileInfo)
+		if err != nil {
+			fmt.Println("Error when reading pointer to string data:", err)
+			return
+		}
+		strLen, err := readUintToUint64(r, f.FileInfo)
+		if err != nil {
+			fmt.Println("Error when reading string data length:", err)
+			return
+		}
+		strData, err := f.Bytes(strPtr, strLen)
+		if err != nil {
+			fmt.Println("Error when reading string data:", err)
+			return
+		}
+		fmt.Println(string(strData))
+	}
+}
+
+func readUintToUint64(r io.Reader, fi *gore.FileInfo) (uint64, error) {
+	if fi.WordSize == 4 {
+		var a uint32
+		err := binary.Read(r, fi.ByteOrder, &a)
+		return uint64(a), err
+	}
+	var a uint64
+	err := binary.Read(r, fi.ByteOrder, &a)
+	return a, err
 }

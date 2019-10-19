@@ -29,6 +29,7 @@ type option struct {
 	lookupType           *int
 	printCompiler        *bool
 	printVersion         *bool
+	resolveStrSlice      *bool
 }
 
 // This is set at compile time.
@@ -39,6 +40,7 @@ var options option
 func init() {
 	if r2g2.CheckForR2Pipe() {
 		options.lookupType = flag.Int("type", 0, "Lookup the Go definition for a type")
+		options.resolveStrSlice = flag.Bool("str", false, "Print slice of strings at offset")
 	} else {
 		options.printPackages = flag.Bool("pkg", false, "List packages")
 		options.printStdLibPackages = flag.Bool("std", false, "Include standard library packages")

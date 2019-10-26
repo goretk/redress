@@ -32,6 +32,14 @@ func standalone() {
 	}
 	defer f.Close()
 
+	// Setting forced version if given
+	if *options.forceVersion != "" {
+		if err = f.SetGoVersion(*options.forceVersion); err != nil {
+			fmt.Println("Failed to set the given Go version:", err)
+			return
+		}
+	}
+
 	if *options.printCompiler {
 		cmp, err := f.GetCompilerVersion()
 		if err != nil {

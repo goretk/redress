@@ -30,6 +30,7 @@ type option struct {
 	printCompiler        *bool
 	printVersion         *bool
 	resolveStrSlice      *bool
+	forceVersion         *string
 }
 
 // This is set at compile time.
@@ -52,6 +53,7 @@ func init() {
 		options.printStructs = flag.Bool("struct", false, "Print structs")
 		options.printIntefaces = flag.Bool("interface", false, "Print interfaces")
 		options.printCompiler = flag.Bool("compiler", false, "Print information")
+		options.forceVersion = flag.String("force-version", "", "Forcing and using the given version when analyzing")
 	}
 	options.printMethods = flag.Bool("method", false, "Print type's methods")
 	options.printVersion = flag.Bool("version", false, "Print redress version")

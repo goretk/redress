@@ -4,14 +4,8 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/goretk/gore v0.8.0 h1:VmIQbe9vl3MmhZt1Hcu+NoqK6obVNZ/S9imdOiGHJ3w=
-github.com/goretk/gore v0.8.0/go.mod h1:feYF9BIRgr3SsMoGBRia9UaifmCTvlYXqM3DmjFLpRo=
-github.com/goretk/gore v0.8.1 h1:mVrOTmeD+fsvguzRI25e+HRjiVCRrdjDA83McYATHC0=
-github.com/goretk/gore v0.8.1/go.mod h1:feYF9BIRgr3SsMoGBRia9UaifmCTvlYXqM3DmjFLpRo=
-github.com/goretk/gore v0.8.2 h1:kEjF1vTp1Kaxuku6HlE8z53lVmJO9PPrCrKQFJ5QBvw=
-github.com/goretk/gore v0.8.2/go.mod h1:feYF9BIRgr3SsMoGBRia9UaifmCTvlYXqM3DmjFLpRo=
-github.com/goretk/gore v0.8.3 h1:oKxkB0zO5w7hjC+cR6VHBY06qx8v/Ej77ZmvKL2PmKM=
-github.com/goretk/gore v0.8.3/go.mod h1:feYF9BIRgr3SsMoGBRia9UaifmCTvlYXqM3DmjFLpRo=
+github.com/goretk/gore v0.8.4 h1:2qxxM2roRlFF2oX1Yk3QltgbnSbJHbrS/khfwP/JpRM=
+github.com/goretk/gore v0.8.4/go.mod h1:feYF9BIRgr3SsMoGBRia9UaifmCTvlYXqM3DmjFLpRo=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=

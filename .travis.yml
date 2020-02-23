@@ -1,0 +1,19 @@
+language: go
+
+os:
+  - linux
+
+script:
+  - make release
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  draft: true
+  on:
+    tags: true
+  api_key: $GITHUB_TOKEN
+  file_glob: true
+  file:
+    - ./dist/*.zip
+    - ./dist/*.tar.gz

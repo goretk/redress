@@ -6,6 +6,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/binary"
 	"flag"
 	"fmt"
@@ -44,6 +45,12 @@ func r2Exec() {
 		return
 	}
 	defer file.Close()
+
+	// Add source code line info
+	if *options.srcLine {
+		srcLineInfo(r2, file)
+		return
+	}
 
 	// Lookup type?
 	if *options.lookupType != 0 {
@@ -215,4 +222,43 @@ func readUintToUint64(r io.Reader, fi *gore.FileInfo) (uint64, error) {
 	var a uint64
 	err := binary.Read(r, fi.ByteOrder, &a)
 	return a, err
+}
+
+func srcLineInfo(r2 *r2g2.Client, file *gore.GoFile) {
+	fn, err := r2.GetCurrentFunction()
+	if err != nil {
+		fmt.Printf("Failed to get current function: %s.\n", err)
+		return
+	}
+
+	tbl, err := file.PCLNTab()
+	if err != nil {
+		fmt.Printf("Failed to get lookup table: %s.\n", err)
+		return
+	}
+
+	var curFile string
+	var curLine int
+	for _, pc := range fn.Ops {
+		fileStr, line, _ := tbl.PCToLine(pc.Offset)
+
+		// Check if on the same source line.
+		if line == curLine && fileStr == curFile {
+			continue
+		}
+		curLine = line
+		curFile = fileStr
+
+		// Add line as multiline comment.
+		comment := fmt.Sprintf("%s:%d", fileStr, line)
+		encodedComment := base64.StdEncoding.EncodeToString([]byte(comment))
+
+		// Execute command.
+		cmd := fmt.Sprintf("CCu base64:%s @ 0x%x", encodedComment, pc.Offset)
+		_, err := r2.Run(cmd)
+		if err != nil {
+			fmt.Println("Error when adding comment:", err)
+			return
+		}
+	}
 }

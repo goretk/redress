@@ -102,7 +102,11 @@ func r2Exec() {
 	applyFuncSymbols(pkgs, r2)
 
 	// Analyze init and main
-	r2.Run("afr @ fcn.main.init")
+	fmt.Println("Analyzing all init functions.")
+	r2.Run("afr @@ fcn.* ~_init")
+	r2.Run("afr @@ fcn.* ~.init")
+
+	fmt.Println("Analyzing all main.main.")
 	r2.Run("afr @ fcn.main.main")
 
 	types, err := file.GetTypes()

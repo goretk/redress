@@ -110,8 +110,7 @@ func r2Exec() {
 
 	// Analyze init and main
 	fmt.Println("Analyzing all init functions.")
-	r2.Run("afr @@ fcn.* ~_init")
-	r2.Run("afr @@ fcn.* ~.init")
+	r2.Run("afr @@ fcn.main~init")
 
 	fmt.Println("Analyzing all main.main.")
 	r2.Run("afr @ fcn.main.main")

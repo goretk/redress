@@ -6,7 +6,7 @@ on:
     - master
     - develop
     tags:
-    - v*
+    - '*'
 
 jobs:
   CI:

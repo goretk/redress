@@ -1,6 +1,12 @@
 name: Main
 
-on: [push, create]
+on:
+  push:
+    branches:
+    - master
+    - develop
+    tags:
+    - v*
 
 jobs:
   CI:

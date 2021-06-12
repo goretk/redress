@@ -2,7 +2,7 @@ name: Build release
 
 on:
   release:
-    types: [created]
+    types: [created, edited, published]
 
 jobs:
   CI:
@@ -22,5 +22,5 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: gh release create -d ${{ github.ref }} ./dist/*
+      run: gh release upload ${{ github.ref }} ./dist/*
     

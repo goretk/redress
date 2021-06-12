@@ -3,8 +3,8 @@ github.com/TcM1911/r2g2 v0.3.2/go.mod h1:PkHPKq4ChUQ67gkJNZDpIFukIClcFtSyBwsqyyF
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/goretk/gore v0.9.0-alpha2 h1:dHKvxY1yUV/4Dducs6wlVubf1QLw0JmboYavS0k7IIY=
-github.com/goretk/gore v0.9.0-alpha2/go.mod h1:cQa3kuurmyYBGPAlfeENhSm5tjdgoLP6Fs3jqJM8ayU=
+github.com/goretk/gore v0.9.0-alpha3 h1:jfN9kXAPztqnN59/8KHcUPaDwBRg33IS6hy7Bh+m9zE=
+github.com/goretk/gore v0.9.0-alpha3/go.mod h1:cQa3kuurmyYBGPAlfeENhSm5tjdgoLP6Fs3jqJM8ayU=
 github.com/matryer/is v1.4.0 h1:sosSmIWwkYITGrxZ25ULNDeKiMNzFSr4V/eqBQP0PeE=
 github.com/matryer/is v1.4.0/go.mod h1:8I/i5uYgLzgsgEloJE1U6xx5HkBQpAZvepWuujKwMRU=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

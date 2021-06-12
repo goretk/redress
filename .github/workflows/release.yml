@@ -8,7 +8,7 @@ on:
         required: true
 
 jobs:
-  CI:
+  manual_release:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -24,7 +24,6 @@ jobs:
       run: make release
 
     - name: Upload files to a GitHub release
-      if: startsWith(github.ref, 'refs/tags/')
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: gh release create -d ${{ github.event.inputs.ver }} ./dist/*

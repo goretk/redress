@@ -58,12 +58,12 @@ windows: ## Make binary for Windows
 .PHONY: linux
 linux: ## Make binary for Linux
 	@echo -e "$(OK_COLOR)[$(APP)] Build for Linux$(NO_COLOR)"
-	@$(LINUX_GO_ENV) $(GO) build -o $(APP)$(BUILD_OPTS) .
+	@$(LINUX_GO_ENV) $(GO) build -o $(APP) $(BUILD_OPTS) .
 
 .PHONY: macos
 macos: ## Make binary for macOS
 	@echo -e "$(OK_COLOR)[$(APP)] Build for macOS$(NO_COLOR)"
-	@$(MACOS_GO_ENV) $(GO) build -o $(APP)$(BUILD_OPTS) .
+	@$(MACOS_GO_ENV) $(GO) build -o $(APP) $(BUILD_OPTS) .
 
 .PHONY: build
 build: ## Make binary

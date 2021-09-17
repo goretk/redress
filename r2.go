@@ -100,10 +100,12 @@ func r2Exec() {
 	vendors, _ := file.GetVendors()
 	std, _ := file.GetSTDLib()
 	unknown, _ := file.GetUnknown()
+	generated, _ := file.GetGeneratedPackages()
 
 	pkgs = append(pkgs, vendors...)
 	pkgs = append(pkgs, std...)
 	pkgs = append(pkgs, unknown...)
+	pkgs = append(pkgs, generated...)
 
 	fmt.Printf("%d packages found.\n", len(pkgs))
 	applyFuncSymbols(pkgs, r2)

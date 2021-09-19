@@ -1,4 +1,4 @@
-// Copyright 2019 The GoRE.tk Authors. All rights reserved.
+// Copyright 2019-2021 The GoRE Authors. All rights reserved.
 // Use of this source code is governed by the license that
 // can be found in the LICENSE file.
 
@@ -8,25 +8,166 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/binary"
-	"flag"
 	"fmt"
 	"io"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
 
 	"github.com/TcM1911/r2g2"
 	gore "github.com/goretk/gore"
+	"github.com/spf13/cobra"
 )
 
 func cleanupName(old string) string {
-	newString := strings.Replace(old, " ", "_", -1)
-	newString = strings.Replace(newString, "-", "_", -1)
-	newString = strings.Replace(newString, ";", "_", -1)
-	return newString
+	replacer := strings.NewReplacer(
+		" ", "_",
+		"-", "_",
+		";", "_",
+		"/", "_",
+		"@", "_",
+	)
+	return replacer.Replace(old)
 }
 
-func r2Exec() {
+func init() {
+	r2Cmd := &cobra.Command{
+		Use:     "r2",
+		Aliases: []string{"radare", "radare2", "r"},
+		Short:   "Use redress with in r2.",
+		// Long:    longR2Help,
+	}
+
+	var useComment bool
+	srcCMD := &cobra.Command{
+		Use:   "line",
+		Short: "Annotate function with source lines.",
+		Args:  cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			if !r2g2.CheckForR2Pipe() {
+				fmt.Println("This command can only be executed from within radare2.")
+				os.Exit(1)
+			}
+			annotateWithSourceLine(useComment)
+		},
+	}
+	srcCMD.Flags().BoolVarP(&useComment, "comment", "c", false, "Use comments instead of flags.")
+
+	r2Cmd.AddCommand(srcCMD)
+
+	typCMD := &cobra.Command{
+		Use:   "type",
+		Short: "Print type definition.",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			if !r2g2.CheckForR2Pipe() {
+				fmt.Println("This command can only be executed from within radare2.")
+				return
+			}
+			addr, err := strconv.ParseUint(args[0], 0, strconv.IntSize)
+			if err != nil {
+				fmt.Printf("Bad address format: %s.\n", err)
+				return
+			}
+			resolveTypeAt(addr)
+		},
+	}
+	r2Cmd.AddCommand(typCMD)
+
+	strArrCMD := &cobra.Command{
+		Use:   "strarr offset length",
+		Short: "Print string array.",
+		Args:  cobra.ExactArgs(2),
+		Run: func(cmd *cobra.Command, args []string) {
+			if !r2g2.CheckForR2Pipe() {
+				fmt.Println("This command can only be executed from within radare2.")
+				return
+			}
+
+			addr, err := strconv.ParseUint(args[0], 0, strconv.IntSize)
+			if err != nil {
+				fmt.Printf("Bad address format: %s.\n", err)
+				return
+			}
+
+			length, err := strconv.ParseUint(args[1], 0, strconv.IntSize)
+			if err != nil {
+				fmt.Printf("Bad length format: %s.\n", err)
+				return
+			}
+
+			extractStringSlice(addr, length)
+		},
+	}
+	r2Cmd.AddCommand(strArrCMD)
+
+	intCMD := &cobra.Command{
+		Use:     "init",
+		Short:   "Perform the initial analysis",
+		Aliases: []string{"analyze", "aaa"},
+		Args:    cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			if !r2g2.CheckForR2Pipe() {
+				fmt.Println("This command can only be executed from within radare2.")
+				return
+			}
+
+			initAnal()
+		},
+	}
+	r2Cmd.AddCommand(intCMD)
+
+	rootCmd.AddCommand(r2Cmd)
+}
+
+func extractStringSlice(addr, length uint64) {
+	// Ensure locations is taken from the pipe.
+	r2, err := r2g2.OpenPipe()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	of, err := r2.GetActiveOpenFile()
+	if err != nil {
+		fmt.Println("Error when getting current open file:", err)
+		return
+	}
+
+	file, err := gore.Open(of.Path)
+	if err != nil {
+		fmt.Println("Error when opening the file:", err)
+		return
+	}
+	defer file.Close()
+
+	printStringSlice(file, addr, length)
+}
+
+func resolveTypeAt(addr uint64) {
+	// Ensure locations is taken from the pipe.
+	r2, err := r2g2.OpenPipe()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	of, err := r2.GetActiveOpenFile()
+	if err != nil {
+		fmt.Println("Error when getting current open file:", err)
+		return
+	}
+
+	file, err := gore.Open(of.Path)
+	if err != nil {
+		fmt.Println("Error when opening the file:", err)
+		return
+	}
+	defer file.Close()
+
+	lookupType(file, addr)
+}
+
+func annotateWithSourceLine(useComment bool) {
 	// Ensure locations is taken from the pipe.
 	r2, err := r2g2.OpenPipe()
 	if err != nil {
@@ -47,37 +188,28 @@ func r2Exec() {
 	defer file.Close()
 
 	// Add source code line info
-	if *options.srcLine {
-		srcLineInfo(r2, file)
+	srcLineInfo(r2, file, useComment)
+}
+
+func initAnal() {
+	// Ensure locations is taken from the pipe.
+	r2, err := r2g2.OpenPipe()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	of, err := r2.GetActiveOpenFile()
+	if err != nil {
+		fmt.Println("Error when getting current open file:", err)
 		return
 	}
 
-	// Lookup type?
-	if *options.lookupType != 0 {
-		lookupType(file, uint64(*options.lookupType))
+	file, err := gore.Open(of.Path)
+	if err != nil {
+		fmt.Println("Error when opening the file:", err)
 		return
 	}
-
-	// Print a string slice
-	if *options.resolveStrSlice {
-		args := flag.Args()
-		if len(args) != 2 {
-			fmt.Println("2 arguments are required. Address and slice length")
-			return
-		}
-		address, err := strconv.ParseUint(args[0], 0, 32)
-		if err != nil {
-			fmt.Println("Failed to parse address argument:", err)
-			return
-		}
-		length, err := strconv.ParseUint(args[1], 0, 32)
-		if err != nil {
-			fmt.Println("Failed to parse length argument:", err)
-			return
-		}
-		printStringSlice(file, address, length)
-		return
-	}
+	defer file.Close()
 
 	// Get compiler version
 	v, err := file.GetCompilerVersion()
@@ -178,9 +310,6 @@ func lookupType(f *gore.GoFile, addr uint64) {
 		default:
 			fmt.Println(typ.String())
 		}
-		if *options.printMethods && len(typ.Methods) != 0 {
-			fmt.Println(gore.MethodDef(typ))
-		}
 	}
 }
 
@@ -225,7 +354,7 @@ func readUintToUint64(r io.Reader, fi *gore.FileInfo) (uint64, error) {
 	return a, err
 }
 
-func srcLineInfo(r2 *r2g2.Client, file *gore.GoFile) {
+func srcLineInfo(r2 *r2g2.Client, file *gore.GoFile, useComment bool) {
 	fn, err := r2.GetCurrentFunction()
 	if err != nil {
 		fmt.Printf("Failed to get current function: %s.\n", err)
@@ -252,14 +381,24 @@ func srcLineInfo(r2 *r2g2.Client, file *gore.GoFile) {
 
 		// Add line as multiline comment.
 		comment := fmt.Sprintf("%s:%d", fileStr, line)
-		encodedComment := base64.StdEncoding.EncodeToString([]byte(comment))
+
+		var cmd string
+		if useComment {
+			encodedComment := base64.StdEncoding.EncodeToString([]byte(comment))
+			cmd = fmt.Sprintf("CCu base64:%s @ 0x%x", encodedComment, pc.Offset)
+		} else {
+			r2.Run("fs line")
+			cmd = fmt.Sprintf("f %s 1 @ 0x%x", cleanupName(comment), pc.Offset)
+		}
 
 		// Execute command.
-		cmd := fmt.Sprintf("CCu base64:%s @ 0x%x", encodedComment, pc.Offset)
 		_, err := r2.Run(cmd)
 		if err != nil {
 			fmt.Println("Error when adding comment:", err)
 			return
 		}
+	}
+	if !useComment {
+		r2.Run("fs *")
 	}
 }

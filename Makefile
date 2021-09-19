@@ -7,7 +7,11 @@ APP = redress
 SHELL = /bin/bash
 DIR = $(shell pwd)
 GO = go
+
 VERSION=$(shell git describe --tags 2> /dev/null || git rev-list -1 HEAD)
+GOREVER=$(shell grep "goretk\/gore" go.mod | awk '{print $$2;}')
+GOVER=$(shell go version | awk '{print $$3;}')
+LDEXTRA=-X "main.redressVersion=$(VERSION)" -X "main.goreVersion=$(GOREVER)" -X "main.compilerVersion=$(GOVER)"
 
 NO_COLOR=\033[0m
 OK_COLOR=\033[32;01m
@@ -20,7 +24,7 @@ TARGET_FOLDER=dist
 PACKAGE=$(APP)-$(VERSION)
 TAR_ARGS=cfz
 RELEASE_FILES=LICENSE README.md
-BUILD_OPTS=-ldflags="-s -w -X main.redressVersion=$(VERSION)" -trimpath
+BUILD_OPTS=-ldflags='-s -w $(LDEXTRA)' -trimpath
 
 # Linux options
 

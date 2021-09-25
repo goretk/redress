@@ -1,75 +1,58 @@
-// Copyright 2019 The GoRE.tk Authors. All rights reserved.
+// Copyright 2019-2021 The GoRE Authors. All rights reserved.
 // Use of this source code is governed by the license that
 // can be found in the LICENSE file.
 
 package main
 
 import (
-	"flag"
 	"fmt"
+	"os"
 
-	"github.com/TcM1911/r2g2"
+	"github.com/cheynewallace/tabby"
+	"github.com/spf13/cobra"
 )
 
 const (
-	assumedGoVersion = "go1.12"
+	assumedGoVersion = "go1.16"
 )
 
-type option struct {
-	printPackages        *bool
-	printStdLibPackages  *bool
-	printVendorPackages  *bool
-	printUnknownPackages *bool
-	includeFilepath      *bool
-	printSourceTree      *bool
-	printTypes           *bool
-	printStructs         *bool
-	printMethods         *bool
-	printIntefaces       *bool
-	lookupType           *int
-	printCompiler        *bool
-	printVersion         *bool
-	resolveStrSlice      *bool
-	forceVersion         *string
-	srcLine              *bool
-}
-
-// This is set at compile time.
+// These are set at compile time.
 var redressVersion string
-
-var options option
-
-func init() {
-	if r2g2.CheckForR2Pipe() {
-		options.lookupType = flag.Int("type", 0, "Lookup the Go definition for a type")
-		options.resolveStrSlice = flag.Bool("str", false, "Print slice of strings at offset")
-		options.srcLine = flag.Bool("line", false, "Add source code line information as comments for the function.")
-	} else {
-		options.printPackages = flag.Bool("pkg", false, "List packages")
-		options.printStdLibPackages = flag.Bool("std", false, "Include standard library packages")
-		options.printVendorPackages = flag.Bool("vendor", false, "Include vendor packages")
-		options.printUnknownPackages = flag.Bool("unknown", false, "Include unknown packages")
-		options.includeFilepath = flag.Bool("filepath", false, "Include file path for packages")
-		options.printSourceTree = flag.Bool("src", false, "Print source tree")
-		options.printTypes = flag.Bool("type", false, "Print all type information")
-		options.printStructs = flag.Bool("struct", false, "Print structs")
-		options.printIntefaces = flag.Bool("interface", false, "Print interfaces")
-		options.printCompiler = flag.Bool("compiler", false, "Print information")
-		options.forceVersion = flag.String("force-version", "", "Forcing and using the given version when analyzing")
-	}
-	options.printMethods = flag.Bool("method", false, "Print type's methods")
-	options.printVersion = flag.Bool("version", false, "Print redress version")
-	flag.Parse()
-}
+var goreVersion string
+var compilerVersion string
 
 func main() {
-	if *options.printVersion {
-		fmt.Printf("Redress version: %s\n", redressVersion)
-		return
-	}
-	if r2g2.CheckForR2Pipe() {
-		r2Exec()
-	} else {
-		standalone()
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 }
+
+var rootCmd = &cobra.Command{
+	Use:   "redress",
+	Short: banner,
+}
+
+func init() {
+	rootCmd.AddCommand(&cobra.Command{
+		Use:   "version",
+		Short: "Display redress version information.",
+		Run: func(cmd *cobra.Command, args []string) {
+			t := tabby.New()
+			t.AddLine("Version:", redressVersion)
+			t.AddLine("GoRE:", goreVersion)
+			t.AddLine("Go:", compilerVersion)
+			fmt.Println(banner)
+			t.Print()
+		},
+	})
+}
+
+const banner = `______         _                  
+| ___ \       | |                 
+| |_/ /___  __| |_ __ ___ ___ ___ 
+|    // _ \/ _  | '__/ _ / __/ __|
+| |\ |  __| (_| | | |  __\__ \__ \
+\_| \_\___|\__,_|_|  \___|___|___/
+                                 
+`

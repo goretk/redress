@@ -1,0 +1,3 @@
+[submodule "gore"]
+	path = gore
+	url = git@github.com:goretk/gore.git

@@ -111,16 +111,16 @@ func listSrc(fileStr string, opts listSrcOptions) {
 		}
 	}
 
-	printFolderStructures(packages)
+	printFolderStructures(f, packages)
 }
 
-func printFolderStructures(pkgs []*gore.Package) {
+func printFolderStructures(f *gore.GoFile, pkgs []*gore.Package) {
 	for i, p := range pkgs {
 		if i != 0 {
 			fmt.Printf("\n")
 		}
 		fmt.Printf("Package %s: %s\n", p.Name, p.Filepath)
-		for _, sf := range p.GetSourceFiles() {
+		for _, sf := range f.GetSourceFiles(p) {
 			sf.Postfix = "\t"
 			fmt.Printf("%s\n", sf)
 		}

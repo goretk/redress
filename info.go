@@ -108,6 +108,11 @@ func listModInfo(fileStr string) {
 	}
 	defer f.Close()
 
+	if f.BuildInfo == nil {
+		fmt.Fprintf(os.Stderr, "No build info found in the file.\n")
+		return
+	}
+
 	if f.BuildInfo.ModInfo == nil {
 		fmt.Fprintf(os.Stderr, "No mod info found in the file.\n")
 		return

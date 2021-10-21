@@ -25,6 +25,17 @@ func init() {
 			listInfo(args[0])
 		},
 	}
+
+	expCmd.AddCommand(&cobra.Command{
+		Use:     "mod /path/to/go/file",
+		Aliases: []string{"m"},
+		Short:   "Display go mod info.",
+		Args:    cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			listModInfo(args[0])
+		},
+	})
+
 	rootCmd.AddCommand(infoCMD)
 }
 
@@ -81,4 +92,43 @@ func listInfo(fileStr string) {
 	}
 
 	t.Print()
+}
+
+func listModInfo(fileStr string) {
+	fp, err := filepath.Abs(fileStr)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to parse the filepath: %s.\n", err)
+		os.Exit(1)
+	}
+
+	f, err := gore.Open(fp)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when opening the file: %s.\n", err)
+		os.Exit(1)
+	}
+	defer f.Close()
+
+	if f.BuildInfo.ModInfo == nil {
+		fmt.Fprintf(os.Stderr, "No mod info found in the file.\n")
+		return
+	}
+
+	mod := f.BuildInfo.ModInfo
+
+	t := tabby.New()
+
+	t.AddHeader("Type", "Name", "Version", "Replaced by", "Hash")
+
+	t.AddLine("main", mod.Main.Path, mod.Main.Version, "", mod.Main.Sum)
+
+	for _, m := range mod.Deps {
+		if m.Replace != nil {
+			t.AddLine("dep", m.Path, m.Version, m.Replace.Path, m.Sum)
+			t.AddLine("replacement", m.Replace.Path, m.Replace.Version, "", m.Sum)
+		} else {
+			t.AddLine("dep", m.Path, m.Version, "", m.Sum)
+		}
+	}
+	t.Print()
+	fmt.Printf("\n")
 }

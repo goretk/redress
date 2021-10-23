@@ -9,7 +9,7 @@ DIR = $(shell pwd)
 GO = go
 
 VERSION=$(shell git describe --tags 2> /dev/null || git rev-list -1 HEAD)
-GOREVER=$(shell grep "goretk\/gore" go.mod | awk '{print $$2;}')
+GOREVER=$(shell grep "goretk\/gore v" go.mod | awk '{print $$2;}')
 GOVER=$(shell go version | awk '{print $$3;}')
 LDEXTRA=-X "main.redressVersion=$(VERSION)" -X "main.goreVersion=$(GOREVER)" -X "main.compilerVersion=$(GOVER)"
 

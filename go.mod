@@ -12,4 +12,4 @@ require (
 )
 
 // This is used during development and disabled for release builds.
-// replace github.com/goretk/gore => ./gore
+replace github.com/goretk/gore => ./gore

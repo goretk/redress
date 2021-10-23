@@ -1,0 +1,31 @@
+name: Build release
+
+on:
+  workflow_dispatch:
+    inputs:
+      ver:
+        description: 'Tag version for the release'
+        required: true
+
+jobs:
+  manual_release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.inputs.ver }}
+        submodules: true
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Build
+      run: make release
+
+    - name: Upload files to a GitHub release
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: gh release create -d ${{ github.event.inputs.ver }} ./dist/*
+    

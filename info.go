@@ -124,7 +124,13 @@ func listModInfo(fileStr string) {
 
 	t.AddHeader("Type", "Name", "Version", "Replaced by", "Hash")
 
-	t.AddLine("main", mod.Main.Path, mod.Main.Version, "", mod.Main.Sum)
+	// If the main path is empty, we fallback to the path in the
+	// build info.
+	mainPath := mod.Main.Path
+	if mainPath == "" {
+		mainPath = mod.Path
+	}
+	t.AddLine("main", mainPath, mod.Main.Version, "", mod.Main.Sum)
 
 	for _, m := range mod.Deps {
 		if m.Replace != nil {

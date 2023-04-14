@@ -26,16 +26,17 @@ func init() {
 		},
 	}
 
-	expCmd.AddCommand(&cobra.Command{
-		Use:     "mod /path/to/go/file",
-		Aliases: []string{"m"},
-		Short:   "Display go mod info.",
+	gomodCMD := &cobra.Command{
+		Use:     "gomod /path/to/go/file",
+		Aliases: []string{"gosum", "gm"},
+		Short:   "Display go mod information.",
 		Args:    cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			listModInfo(args[0])
 		},
-	})
+	}
 
+	rootCmd.AddCommand(gomodCMD)
 	rootCmd.AddCommand(infoCMD)
 }
 

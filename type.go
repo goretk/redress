@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 
 	gore "github.com/goretk/gore"
@@ -81,6 +82,39 @@ func init() {
 	typCmd.Flags().BoolVarP(&includeMethods, "methods", "m", false, "Include method definitions.")
 	typCmd.Flags().StringVar(&forceGoVersion, "version", assumedGoVersion, "Fallback compiler version.")
 
+	typeOffsetCmd := &cobra.Command{
+		Use:   "offset address path/to/file",
+		Short: "Print type at the given address.",
+		Args:  cobra.ExactArgs(2),
+		Run: func(cmd *cobra.Command, args []string) {
+			addr, err := strconv.ParseUint(args[0], 0, strconv.IntSize)
+			if err != nil {
+				fmt.Printf("Bad address format: %s.\n", err)
+				return
+			}
+			file, err := gore.Open(args[1])
+			if err != nil {
+				fmt.Println("Error when opening the file:", err)
+				return
+			}
+			defer file.Close()
+
+			// If the user has provided a specific compiler version that we should assume,
+			// we force it.
+			if forceGoVersion != "" {
+				err = file.SetGoVersion(forceGoVersion)
+				if err != nil {
+					fmt.Println("Error when setting the assumed Go version:", err)
+					return
+				}
+			}
+
+			lookupType(file, addr)
+		},
+	}
+	typeOffsetCmd.Flags().StringVar(&forceGoVersion, "version", "", "Fallback compiler version.")
+
+	typCmd.AddCommand(typeOffsetCmd)
 	rootCmd.AddCommand(typCmd)
 }
 

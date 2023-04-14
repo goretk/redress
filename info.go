@@ -26,16 +26,17 @@ func init() {
 		},
 	}
 
-	expCmd.AddCommand(&cobra.Command{
-		Use:     "mod /path/to/go/file",
-		Aliases: []string{"m"},
-		Short:   "Display go mod info.",
+	gomodCMD := &cobra.Command{
+		Use:     "gomod /path/to/go/file",
+		Aliases: []string{"gosum", "gm"},
+		Short:   "Display go mod information.",
 		Args:    cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			listModInfo(args[0])
 		},
-	})
+	}
 
+	rootCmd.AddCommand(gomodCMD)
 	rootCmd.AddCommand(infoCMD)
 }
 
@@ -91,6 +92,13 @@ func listInfo(fileStr string) {
 		}
 	}
 
+	// Display extracted build information if it's available.
+	if f.BuildInfo != nil && f.BuildInfo.ModInfo != nil && len(f.BuildInfo.ModInfo.Settings) != 0 {
+		for _, set := range f.BuildInfo.ModInfo.Settings {
+			t.AddLine(set.Key, set.Value)
+		}
+	}
+
 	t.Print()
 }
 
@@ -124,7 +132,13 @@ func listModInfo(fileStr string) {
 
 	t.AddHeader("Type", "Name", "Version", "Replaced by", "Hash")
 
-	t.AddLine("main", mod.Main.Path, mod.Main.Version, "", mod.Main.Sum)
+	// If the main path is empty, we fallback to the path in the
+	// build info.
+	mainPath := mod.Main.Path
+	if mainPath == "" {
+		mainPath = mod.Path
+	}
+	t.AddLine("main", mainPath, mod.Main.Version, "", mod.Main.Sum)
 
 	for _, m := range mod.Deps {
 		if m.Replace != nil {

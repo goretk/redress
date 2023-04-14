@@ -37,8 +37,10 @@ Usage:
 
 Available Commands:
   completion  generate the autocompletion script for the specified shell
+  gomod       Display go mod information.
   help        Help about any command
   info        Print summary information.
+  moduledata  Display sections extracted from the moduledata structure.
   packages    List packages.
   r2          Use redress with in r2.
   source      Source Code Projection.

@@ -29,14 +29,14 @@ func init() {
 	dumpCMD := &cobra.Command{
 		Use:   "dump section path/to/file",
 		Args:  cobra.ExactValidArgs(2),
-		Short: "Dump the content of a section to standard out.",
+		Short: "Dump the contents of a section to standard out.",
 		Run: func(cmd *cobra.Command, args []string) {
 			dumpModuleSection(args[1], args[0])
 		},
 	}
 	modCMD.AddCommand(dumpCMD)
 
-	expCmd.AddCommand(modCMD)
+	rootCmd.AddCommand(modCMD)
 }
 
 func dumpModuleSection(fp, section string) {

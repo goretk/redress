@@ -91,6 +91,13 @@ func listInfo(fileStr string) {
 		}
 	}
 
+	// Display extracted build information if it's available.
+	if f.BuildInfo != nil && f.BuildInfo.ModInfo != nil && len(f.BuildInfo.ModInfo.Settings) != 0 {
+		for _, set := range f.BuildInfo.ModInfo.Settings {
+			t.AddLine(set.Key, set.Value)
+		}
+	}
+
 	t.Print()
 }
 

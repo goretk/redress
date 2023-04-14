@@ -1,6 +1,6 @@
 module github.com/goretk/redress
 
-go 1.18
+go 1.20
 
 require (
 	github.com/TcM1911/r2g2 v0.3.2

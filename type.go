@@ -99,9 +99,20 @@ func init() {
 			}
 			defer file.Close()
 
+			// If the user has provided a specific compiler version that we should assume,
+			// we force it.
+			if forceGoVersion != "" {
+				err = file.SetGoVersion(forceGoVersion)
+				if err != nil {
+					fmt.Println("Error when setting the assumed Go version:", err)
+					return
+				}
+			}
+
 			lookupType(file, addr)
 		},
 	}
+	typeOffsetCmd.Flags().StringVar(&forceGoVersion, "version", "", "Fallback compiler version.")
 
 	typCmd.AddCommand(typeOffsetCmd)
 	rootCmd.AddCommand(typCmd)

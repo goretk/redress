@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -228,6 +229,15 @@ func initAnal() {
 		return
 	}
 
+	var correction uint64
+	if file.FileInfo.OS == "windows" {
+		textStart := getFileSectionAddress(r2, ".text")
+		correction = findAddressCorrection(file, textStart)
+		if correction != 0 {
+			fmt.Printf("PE .text section and Go runtime mismatch. Using address correction 0x%x.\n", correction)
+		}
+	}
+
 	// Vendors, stdlib and unknown have now been populated so we can ignore the err check.
 	vendors, _ := file.GetVendors()
 	std, _ := file.GetSTDLib()
@@ -240,7 +250,7 @@ func initAnal() {
 	pkgs = append(pkgs, generated...)
 
 	fmt.Printf("%d packages found.\n", len(pkgs))
-	applyFuncSymbols(pkgs, r2)
+	applyFuncSymbols(pkgs, r2, correction)
 
 	// Analyze init and main
 	fmt.Println("Analyzing all init functions.")
@@ -265,7 +275,19 @@ func initAnal() {
 	fmt.Printf("%d type symbols found\n", count)
 }
 
-func applyFuncSymbols(pkgs []*gore.Package, r2 *r2g2.Client) {
+func findAddressCorrection(file *gore.GoFile, headerTextAddress uint64) uint64 {
+	modData, err := file.Moduledata()
+	if err != nil {
+		return 0
+	}
+	mtxt := modData.Text().Address
+	if headerTextAddress >= mtxt {
+		return 0
+	}
+	return mtxt - headerTextAddress
+}
+
+func applyFuncSymbols(pkgs []*gore.Package, r2 *r2g2.Client, correction uint64) {
 	count := 0
 	for _, p := range pkgs {
 		for _, f := range p.Functions {
@@ -274,7 +296,7 @@ func applyFuncSymbols(pkgs []*gore.Package, r2 *r2g2.Client) {
 			}
 			r2.NewFlagWithLength(
 				"fcn."+cleanupName(p.Name)+"."+cleanupName(f.Name),
-				f.Offset,
+				f.Offset+correction,
 				f.End-f.Offset)
 			count++
 		}
@@ -284,7 +306,7 @@ func applyFuncSymbols(pkgs []*gore.Package, r2 *r2g2.Client) {
 			}
 			r2.NewFlagWithLength(
 				"fcn."+cleanupName(p.Name)+"#"+cleanupName(m.Receiver)+"."+cleanupName(m.Name),
-				m.Offset,
+				m.Offset+correction,
 				m.End-m.Offset)
 			count++
 		}
@@ -401,4 +423,33 @@ func srcLineInfo(r2 *r2g2.Client, file *gore.GoFile, useComment bool) {
 	if !useComment {
 		r2.Run("fs *")
 	}
+}
+
+func getFileSectionAddress(r2 *r2g2.Client, name string) uint64 {
+	data, err := r2.Run("iSj")
+	if err != nil {
+		return 0
+	}
+
+	var sections []struct {
+		Name        string `json:"name"`
+		Size        uint64 `json:"size"`
+		VSize       uint64 `json:"vsize"`
+		Permissions string `json:"perm"`
+		PAddr       uint64 `json:"paddr"`
+		VAddr       uint64 `json:"vaddr"`
+	}
+
+	err = json.Unmarshal(data, &sections)
+	if err != nil {
+		return 0
+	}
+
+	for _, s := range sections {
+		if s.Name == name {
+			return s.VAddr
+		}
+	}
+
+	return 0
 }

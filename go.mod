@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/TcM1911/r2g2 v0.3.2
 	github.com/cheynewallace/tabby v1.1.1
-	github.com/goretk/gore v0.11.0
+	github.com/goretk/gore v0.11.1
 	github.com/spf13/cobra v1.2.1
 )
 

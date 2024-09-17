@@ -1,6 +1,8 @@
 module github.com/goretk/redress
 
-go 1.20
+go 1.21
+
+toolchain go1.22.5
 
 require (
 	github.com/TcM1911/r2g2 v0.3.2
@@ -12,8 +14,7 @@ require (
 require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	golang.org/x/arch v0.0.0-20220412001346-fc48f9fe4c15 // indirect
-	golang.org/x/mod v0.5.1 // indirect
+	golang.org/x/arch v0.7.0 // indirect
 )
 
 // This is used during development and disabled for release builds.

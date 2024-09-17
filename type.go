@@ -144,7 +144,7 @@ func listTypes(fileStr string, opts listTypesOptions) {
 
 	if opts.goversion != "" {
 		if err := f.SetGoVersion(opts.goversion); err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to set goversion:", err)
+			fmt.Fprintln(os.Stderr, "Failed to set goversion:", err)
 			os.Exit(1)
 		}
 	}

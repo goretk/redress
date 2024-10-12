@@ -142,14 +142,17 @@ func listTypes(fileStr string, opts listTypesOptions) {
 	}
 	defer f.Close()
 
-	typs, err := f.GetTypes()
-	if err == gore.ErrNoGoVersionFound {
-		// Force the assumed version and try again.
-		f.SetGoVersion(opts.goversion)
-		typs, err = f.GetTypes()
+	if opts.goversion != "" {
+		if err := f.SetGoVersion(opts.goversion); err != nil {
+			fmt.Fprintln(os.Stderr, "Failed to set goversion:", err)
+			os.Exit(1)
+		}
 	}
+
+	var typs []*gore.GoType
+	typs, err = f.GetTypes()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when enumerating types: %s.\n", err)
+		fmt.Fprintln(os.Stderr, "Error when enumerating types:", err, "\n\nUse --version to explicitly set it.")
 		os.Exit(1)
 	}
 

@@ -1,0 +1,43 @@
+name: Auto release on Gore update
+
+on:
+  schedule:
+    - cron: '30 7 * * *' # Run 30 min after Gore's update job.
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: "master" # Always run off the stable branch.
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: "stable"
+
+    - name: Try to update to the latest Gore release
+      run: go get -u github.com/goretk/gore@latest && go mod tidy
+
+    - name: Create a release if updated
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        if [[ -n $(git status --porcelain) ]]; then
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add go.mod go.sum
+          git commit -m "Update Gore version"
+          git push
+          # Increment the patch version and create a new tag
+          VER=$(git describe --tags --abbrev=0 | awk -F. -v OFS=. '{$NF += 1 ; print}')
+          git tag $VER
+          git push --tags
+        else
+            echo "::notice::No new version."
+        fi  

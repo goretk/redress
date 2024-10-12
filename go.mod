@@ -5,8 +5,8 @@ go 1.21
 require (
 	github.com/TcM1911/r2g2 v0.3.2
 	github.com/cheynewallace/tabby v1.1.1
-	github.com/goretk/gore v0.11.3
-	github.com/spf13/cobra v1.8.0
+	github.com/goretk/gore v0.11.4
+	github.com/spf13/cobra v1.2.1
 )
 
 require (
@@ -15,6 +15,3 @@ require (
 	golang.org/x/arch v0.6.0 // indirect
 	golang.org/x/mod v0.14.0 // indirect
 )
-
-// This is used during development and disabled for release builds.
-// replace github.com/goretk/gore => ./gore

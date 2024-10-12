@@ -12,14 +12,12 @@ jobs:
   CI:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
+    - uses: actions/checkout@v4
 
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
-        go-version: ">=1.21.0"
+        go-version: "stable"
 
     - name: Build
       run: make release
@@ -28,5 +26,7 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: gh release create -d ${{ github.ref }} ./dist/*
+      run: |
+        VER=$(git describe --tags --abbrev=0 | awk -F. -v OFS=. '{$NF += 1 ; print}')
+        gh release create --verify-tag --generate-notes $VER ./dist/*
     

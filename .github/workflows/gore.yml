@@ -39,6 +39,8 @@ jobs:
           VER=$(git describe --tags --abbrev=0 | awk -F. -v OFS=. '{$NF += 1 ; print}')
           git tag $VER
           git push --tags
+          # Build binaries and release
+          make release && gh release create --verify-tag --generate-notes $VER ./dist/*
         else
             echo "::notice::No new version."
         fi

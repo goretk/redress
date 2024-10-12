@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Needed for "git describe"
 
     - name: Set up Go
       uses: actions/setup-go@v5
@@ -27,6 +29,6 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        VER=$(git describe --tags --abbrev=0 | awk -F. -v OFS=. '{$NF += 1 ; print}')
+        VER=$(git describe --tags --abbrev=0)
         gh release create --verify-tag --generate-notes $VER ./dist/*
     

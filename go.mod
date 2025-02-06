@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/TcM1911/r2g2 v0.3.2
 	github.com/cheynewallace/tabby v1.1.1
-	github.com/goretk/gore v0.13.5
+	github.com/goretk/gore v0.13.6
 	github.com/spf13/cobra v1.8.1
 )
 

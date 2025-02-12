@@ -9,8 +9,8 @@ github.com/cheynewallace/tabby v1.1.1/go.mod h1:Pba/6cUL8uYqvOc9RkyvFbHGrQ9wShyr
 github.com/cpuguy83/go-md2man/v2 v2.0.4/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/goretk/gore v0.13.6 h1:+cFIcU8b32qyOT5YaqzY7V/ZojukeY6fRD94ZhyaXXE=
-github.com/goretk/gore v0.13.6/go.mod h1:xpNkrDy+K4EZE/Z8vhN/0tGZsK775YqyjibI81jeqfg=
+github.com/goretk/gore v0.13.7 h1:rtsIFPQHnrkj07Dx3zJtGWHLOs/xV/aEIP7uILubVQM=
+github.com/goretk/gore v0.13.7/go.mod h1:xpNkrDy+K4EZE/Z8vhN/0tGZsK775YqyjibI81jeqfg=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/matryer/is v1.4.0 h1:sosSmIWwkYITGrxZ25ULNDeKiMNzFSr4V/eqBQP0PeE=

@@ -13,7 +13,7 @@ require (
 
 require (
 	github.com/blacktop/go-dwarf v1.0.14 // indirect
-	github.com/blacktop/go-macho v1.1.250 // indirect
+	github.com/blacktop/go-macho v1.1.251 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/arch v0.22.0 // indirect
